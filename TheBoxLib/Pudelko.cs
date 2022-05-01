@@ -11,38 +11,32 @@ namespace WellFormedClass_TheBox
     public sealed class Pudelko : IFormattable, IEquatable<Pudelko>, IEnumerable
     {
         private double _a, _b, _c;
-        public double A
-        {
-            get => Math.Round(_a, 3);
-            init => _a = value;
-        }
-        public double B
-        {
-            get => Math.Round(_b, 3);
-            init => _b = value;
-        }        
-        public double C
-        {
-            get => Math.Round(_c, 3);
-            init => _c = value;
-        }
-        
-        public UnitOfMeasure Unit { get; init; } //i needed that for constructor to work properly
+        public double A => Math.Round(_a, 3);
+
+        public double B => Math.Round(_b, 3);
+
+        public double C => Math.Round(_c, 3);
+
         public double[] boxParameters => new[] {_a, _b, _c};
         public double Objetosc => Math.Round(_a * _b * _c, 9);
         public double Pole => Math.Round(_a * _b * 2 + _a * _c * 2 + _b * _c * 2, 6);
 
-        public Pudelko(double a = 0.1, double b = 0.1, double c = 0.1, UnitOfMeasure unit = UnitOfMeasure.Meter)
+        public Pudelko(double a = Double.MinValue, double b = Double.MinValue, double c = Double.MinValue, UnitOfMeasure unit = UnitOfMeasure.Meter)
         {
-            Unit = unit;
-            double _a = UnitMeasureConverter.ConvertToMeters(a, Unit);
-            if (_a is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(_a),$"_a is {_a} and a is {a}");
-
-            _b = UnitMeasureConverter.ConvertToMeters(b, Unit);
-            if (_b is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(_b));
+            if (a == Double.MinValue) _a = 0.1;
+            else _a = UnitMeasureConverter.ConvertToMeters(a, unit);
             
-            _c = UnitMeasureConverter.ConvertToMeters(c, Unit);
-            if (_c is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(_c));
+            if (_a is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(_a),$"a must be >0 and <=10");
+
+            if (b == Double.MinValue) _b = 0.1;
+            else _b = UnitMeasureConverter.ConvertToMeters(b, unit);
+            
+            if (_b is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(_b), $"b must be >0 and <=10");
+            
+            if (c == Double.MinValue) _c= 0.1;
+            else _c = UnitMeasureConverter.ConvertToMeters(c, unit);
+            
+            if (_c is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(_c), "c must be >0 and <=10");
         }
         
         public override string ToString() {
