@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
@@ -62,6 +63,8 @@ namespace WellFormedClass_TheBox
             return HashCode.Combine(A, B, C);
         }
 
+
+
         public static bool operator ==(Pudelko box, Pudelko otherBox)
         {
             return (box, otherBox) switch
@@ -85,41 +88,33 @@ namespace WellFormedClass_TheBox
             
             return new Pudelko(a, b, c);
         }
+
+        public static explicit operator double[](Pudelko box) => new[] {box.A, box.B, box.C};
+
+        public static implicit operator Pudelko(ValueTuple<int, int, int> values) =>
+            new(values.Item1, values.Item2, values.Item3, UnitOfMeasure.Millimeter);
+        public double this[int index] => boxParameters[index];
         
-        
-        //public static pudelko (pudelko p1, pudelko p2) ktore returnuje p3 -
-        // najmniejsze mozliwe pudelko, do ktorego zmieszcza sie razem p1 i p2
-        
-        /*7. konwersja
-        jawna - rzutowanie - przeciązenie operatora ()
-        ma przeerzucic pudelko na (double[] p)
-        
-        public static implicit/explicit operator....(...) 
-        
-        niejawna
-        jesli w kontekscie pudelka pojawi sie p = (2, 3, 55) ma automatycznie zostac traktowane jak pudelko
-        p - podane dane są w mm jako ValueTuple, np pudelko p3 = (2,3,5)+(40,8,10) ma działać
-        
+        /*
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
         */
-        
-        /*8. indexer - przeciazenie operatora [] public static override operator this[i]()
-        pozwala odczytac wartosc obiektu tak jakbysmy czytali tablice
-        pudelko p ma wymiary a,b,c - chcemy moc sie do nich postac p[0] = a, p[1] = b, p[2] =c         
-        */
-        
-        /* iterator - mechanizm przeglądania obiektu za pomocą foreacha
-         foreach (double wymiar in pudelko p)
-         elementy zdefiniowane tym iteratorem bedziemy mogli przegladac
-         np. do obliczenia objetosci
-         
-         :ienumerable
-         */
+        //ktora wersja jest poprawniejsza
         public IEnumerator GetEnumerator()
         {
-           //yield return
-            throw new NotImplementedException();
+            foreach (var parameter in boxParameters)
+            {
+                yield return parameter;
+            }
         }
         //parsowanie z inputu jako string
+        public static Pudelko Parse(string text)
+        {
+            throw new NotImplementedException();
+        }
+
         //metoda rozszerzajaca
         //metoda sortujaca - definiujac lambdę
     }
