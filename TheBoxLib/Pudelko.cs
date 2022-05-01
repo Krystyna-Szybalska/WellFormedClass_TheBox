@@ -8,64 +8,85 @@ namespace WellFormedClass_TheBox
     //TheBox class
     public sealed class Pudelko : IFormattable, IEquatable<Pudelko>, IEnumerable
     {
-        
-        private double a, b, c;
-        private double[] box_parameters;
-        public double A => Math.Round(a, 3);
-        public double B => Math.Round(b, 3);
-        public double C => Math.Round(c, 3);
-        public double Objetosc => Math.Round(a * b * c, 9);
-        public double Pole => Math.Round(a * b * 2 + a * c * 2 + b * c * 2, 6);
+        private double _a, _b, _c;
+        public double A => Math.Round(_a, 3);
+        public double B => Math.Round(_b, 3);
+        public double C => Math.Round(_c, 3);
+        public double[] boxParameters => new[] {_a, _b, _c};
+        public double Objetosc => Math.Round(_a * _b * _c, 9);
+        public double Pole => Math.Round(_a * _b * 2 + _a * _c * 2 + _b * _c * 2, 6);
 
-       //if unit is not given it should be meter
-        public Pudelko(double a = 0.01, double b=0.01, double c=0.01, UnitOfMeasure unit = UnitOfMeasure.Meter)
+        public Pudelko(double a = 0.01, double b = 0.01, double c = 0.01, UnitOfMeasure unit = UnitOfMeasure.Meter)
         {
-            //parameters should be between 0-10 meters
-            if (A <= 0 || A > 10 || B <= 0 || B > 10 || C <= 0 || C > 10 ) throw new ArgumentOutOfRangeException();
-           
+            if (a is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(a));
+            if (b is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(b));
+            if (c is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(c));
+
+            _a = a;
+            _b = b;
+            _c = c;
         }
         
-        public string ToString(string? format, IFormatProvider? formatProvider)
+        public string ToString(string? format, IFormatProvider? formatProvider = null)
         {
             if (formatProvider is null) {
-                formatProvider = CultureInfo.CurrentCulture;  //dlaczego nie mogę tego zrobić w pierwszej linijce
+                formatProvider = CultureInfo.CurrentCulture; 
             }
             return format switch {
                 "m" => $"{A.ToString("#0.000",formatProvider)} m × " +
                        $"{B.ToString("#0.000",formatProvider)} m × " +
                        $"{C.ToString("#0.000",formatProvider)} m",
-                /*"cm" => $"{MeasureConverter.ConvertToCentimeters(A).ToString("F1", formatProvider)} cm × " +
-                        $"{MeasureConverter.ConvertToCentimeters(B).ToString("F1", formatProvider)} cm × " +
-                        $"{MeasureConverter.ConvertToCentimeters(C).ToString("F1", formatProvider)} cm",
-                "mm" => $"{MeasureConverter.ConvertToMilimeters(A).ToString("####0", formatProvider)} mm × " +
-                        $"{MeasureConverter.ConvertToMilimeters(B).ToString("####0", formatProvider)} mm × " +
-                        $"{MeasureConverter.ConvertToMilimeters(C).ToString("####0", formatProvider)} mm",*/
+                "cm" => $"{UnitMeasureConverter.ConvertToCentimeters(A).ToString("###0.0", formatProvider)} cm × " +
+                        $"{UnitMeasureConverter.ConvertToCentimeters(B).ToString("###0.0", formatProvider)} cm × " +
+                        $"{UnitMeasureConverter.ConvertToCentimeters(C).ToString("###0.0", formatProvider)} cm",
+                "mm" => $"{UnitMeasureConverter.ConvertToMillimeters(A).ToString("####0", formatProvider)} mm × " +
+                        $"{UnitMeasureConverter.ConvertToMillimeters(B).ToString("####0", formatProvider)} mm × " +
+                        $"{UnitMeasureConverter.ConvertToMillimeters(C).ToString("####0", formatProvider)} mm",
                 _ => throw new FormatException()
             };
         }
-
-        public string ToString(string format)
-        {
-            return ToString(format, null);
-
-        }
-
-        //override Wquals(objcet) i GetHashCode
-
-        public override bool Equals(object? obj) {
-            if (obj == null || !(obj is Pudelko)) return false;
+        
+        public override bool Equals(object obj) {
+            if ( !(obj is Pudelko) || obj == null) return false;
             var box = (Pudelko)obj;
-            var new_parameters = new[] { box.A, box.B, box.C };
-            return box_parameters.All(new_parameters.Contains) && box_parameters.Length == new_parameters.Length;
-        }
-
-        public bool Equals(Pudelko? box) {
-            //przeciazyc == i !=
-
-            return Equals((object?)box);
+            var newParameters = box.boxParameters; //To do: czy to dziala?
+            return boxParameters.All(newParameters.Contains) && boxParameters.Length == newParameters.Length;
         }
         
-        //6. operator+
+        public bool Equals(Pudelko other)
+        {
+            return Equals((object)other);
+        }
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(A, B, C);
+        }
+
+        public static bool operator ==(Pudelko box, Pudelko otherBox)
+        {
+            return (box, otherBox) switch
+            {
+                (null, null) => true,
+                (null, not null) => false,
+                (not null, null) => false,
+                _ => box.Equals(otherBox)
+            };
+        }
+
+        public static bool operator !=(Pudelko? box, Pudelko? otherBox) => !(box == otherBox);
+        
+        public static Pudelko operator +(Pudelko firstBox, Pudelko secondBox)
+        {
+            var firstBoxParameters = firstBox.boxParameters.OrderBy(a => a).ToArray();
+            var secondBoxParameters = secondBox.boxParameters.OrderBy(a => a).ToArray();
+            var a = firstBoxParameters[0]+secondBoxParameters[0];
+            var b = Math.Max(firstBoxParameters[1], secondBoxParameters[1]);
+            var c = Math.Max(firstBoxParameters[2], secondBoxParameters[2]);
+            
+            return new Pudelko(a, b, c);
+        }
+        
+        
         //public static pudelko (pudelko p1, pudelko p2) ktore returnuje p3 -
         // najmniejsze mozliwe pudelko, do ktorego zmieszcza sie razem p1 i p2
         

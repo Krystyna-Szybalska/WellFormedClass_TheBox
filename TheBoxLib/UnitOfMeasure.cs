@@ -2,8 +2,7 @@ namespace WellFormedClass_TheBox
 {
     public enum UnitOfMeasure
     {
-        Unknown = 0,
-        Milimeter,
+        Millimeter,
         Centimeter,
         Meter
     }
