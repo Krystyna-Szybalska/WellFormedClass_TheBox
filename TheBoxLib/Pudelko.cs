@@ -11,30 +11,50 @@ namespace WellFormedClass_TheBox
     public sealed class Pudelko : IFormattable, IEquatable<Pudelko>, IEnumerable
     {
         private double _a, _b, _c;
-        public double A => Math.Round(_a, 3);
-        public double B => Math.Round(_b, 3);
-        public double C => Math.Round(_c, 3);
+        public double A
+        {
+            get => Math.Round(_a, 3);
+            init => _a = value;
+        }
+        public double B
+        {
+            get => Math.Round(_b, 3);
+            init => _b = value;
+        }        
+        public double C
+        {
+            get => Math.Round(_c, 3);
+            init => _c = value;
+        }
+        
+        public UnitOfMeasure Unit { get; init; } //i needed that for constructor to work properly
         public double[] boxParameters => new[] {_a, _b, _c};
         public double Objetosc => Math.Round(_a * _b * _c, 9);
         public double Pole => Math.Round(_a * _b * 2 + _a * _c * 2 + _b * _c * 2, 6);
 
         public Pudelko(double a = 0.1, double b = 0.1, double c = 0.1, UnitOfMeasure unit = UnitOfMeasure.Meter)
         {
-            _a = UnitMeasureConverter.ConvertToMeters(a, unit);
-            if (_a is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(a));
+            Unit = unit;
+            double _a = UnitMeasureConverter.ConvertToMeters(a, Unit);
+            if (_a is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(_a),$"_a is {_a} and a is {a}");
 
-            _b = UnitMeasureConverter.ConvertToMeters(b, unit);
-            if (_b is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(b));
+            _b = UnitMeasureConverter.ConvertToMeters(b, Unit);
+            if (_b is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(_b));
             
-            _c = UnitMeasureConverter.ConvertToMeters(c, unit);
-            if (_c is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(c));
+            _c = UnitMeasureConverter.ConvertToMeters(c, Unit);
+            if (_c is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(_c));
         }
         
+        public override string ToString() {
+            return $"{A.ToString("#0.000", null)} m × " +
+                   $"{B.ToString("#0.000", null)} m × " +
+                   $"{C.ToString("#0.000", null)} m";
+        }
         public string ToString(string? format, IFormatProvider? formatProvider = null)
         {
-            if (formatProvider is null) {
-                formatProvider = CultureInfo.CurrentCulture; 
-            }
+            if (formatProvider is null) formatProvider = CultureInfo.CurrentCulture;
+            if (format == null) format = "m";
+            
             return format switch {
                 "m" => $"{A.ToString("#0.000",formatProvider)} m × " +
                        $"{B.ToString("#0.000",formatProvider)} m × " +
@@ -64,9 +84,6 @@ namespace WellFormedClass_TheBox
         {
             return HashCode.Combine(A, B, C);
         }
-
-
-
         public static bool operator ==(Pudelko box, Pudelko otherBox)
         {
             return (box, otherBox) switch

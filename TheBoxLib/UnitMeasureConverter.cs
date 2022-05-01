@@ -8,9 +8,9 @@ namespace WellFormedClass_TheBox
         public static double ConvertToMillimeters(double value, UnitOfMeasure unit = UnitOfMeasure.Meter)
         {
             return unit switch {
-            UnitOfMeasure.Millimeter => value,
-            UnitOfMeasure.Centimeter => value/10,
-            UnitOfMeasure.Meter => value/1000,
+            UnitOfMeasure.Millimeter => Math.Round(value, 0),
+            UnitOfMeasure.Centimeter => Math.Round(value*10, 1),
+            UnitOfMeasure.Meter => Math.Round(value*1000, 3),
             _ => throw new InvalidOperationException()
             };
         }
@@ -18,9 +18,9 @@ namespace WellFormedClass_TheBox
         public static double ConvertToCentimeters(double value, UnitOfMeasure unit = UnitOfMeasure.Meter)
         {
             return unit switch {
-            UnitOfMeasure.Millimeter => value/10,
-            UnitOfMeasure.Centimeter => value,
-            UnitOfMeasure.Meter => value*100,
+            UnitOfMeasure.Millimeter => Math.Round(value/10, 0),
+            UnitOfMeasure.Centimeter => Math.Round(value, 1),
+            UnitOfMeasure.Meter => Math.Round(value*100, 3),
             _ => throw new InvalidOperationException()
             };
         }
@@ -28,9 +28,9 @@ namespace WellFormedClass_TheBox
         public static double ConvertToMeters(double value, UnitOfMeasure unit = UnitOfMeasure.Meter)
         {
             return unit switch {
-            UnitOfMeasure.Millimeter => value*1000,
-            UnitOfMeasure.Centimeter => value*100,
-            UnitOfMeasure.Meter => value,
+            UnitOfMeasure.Millimeter => Math.Round(value/1000, 0),
+            UnitOfMeasure.Centimeter => Math.Round(value/100, 1),
+            UnitOfMeasure.Meter => Math.Round(value, 3),
             _ => throw new InvalidOperationException()
             };
         }
