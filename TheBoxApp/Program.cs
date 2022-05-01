@@ -6,7 +6,7 @@ namespace WellFormedClass_TheBox
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+                
         }
     }
 }

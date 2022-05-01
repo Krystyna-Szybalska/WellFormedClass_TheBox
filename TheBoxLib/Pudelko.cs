@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net.Mail;
 
 namespace WellFormedClass_TheBox
 {
@@ -17,15 +18,16 @@ namespace WellFormedClass_TheBox
         public double Objetosc => Math.Round(_a * _b * _c, 9);
         public double Pole => Math.Round(_a * _b * 2 + _a * _c * 2 + _b * _c * 2, 6);
 
-        public Pudelko(double a = 0.01, double b = 0.01, double c = 0.01, UnitOfMeasure unit = UnitOfMeasure.Meter)
+        public Pudelko(double a = 0.1, double b = 0.1, double c = 0.1, UnitOfMeasure unit = UnitOfMeasure.Meter)
         {
-            if (a is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(a));
-            if (b is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(b));
-            if (c is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(c));
+            _a = UnitMeasureConverter.ConvertToMeters(a, unit);
+            if (_a is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(a));
 
-            _a = a;
-            _b = b;
-            _c = c;
+            _b = UnitMeasureConverter.ConvertToMeters(b, unit);
+            if (_b is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(b));
+            
+            _c = UnitMeasureConverter.ConvertToMeters(c, unit);
+            if (_c is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(c));
         }
         
         public string ToString(string? format, IFormatProvider? formatProvider = null)
@@ -112,7 +114,30 @@ namespace WellFormedClass_TheBox
         //parsowanie z inputu jako string
         public static Pudelko Parse(string text)
         {
-            throw new NotImplementedException();
+            //new P(2.5, 9.321, 0.1) == P.Parse("2.500 m × 9.321 m × 0.100 m")
+            
+            string[] parametersString = text.Replace(" ", String.Empty).Split('×');
+            List<double> parameters = new List<double>();
+
+            foreach (var parameter in parametersString)
+            {
+                if (parametersString.Length != 3) throw new FormatException(nameof(text));
+                if (parameter.Contains("mm")) {
+                    if (!Double.TryParse(parameter.Replace("mm", String.Empty), out double a_mm)) throw new FormatException(nameof(text));
+                    parameters.Add(a_mm / 1000); 
+                }
+                else if (parameter.Contains("cm")) {
+                    if (!Double.TryParse(parameter.Replace("cm", String.Empty), out double b_cm)) throw new FormatException(nameof(text));
+                    parameters.Add(b_cm / 100); 
+                }
+                else if (parameter.Contains("m")) {
+                    if (!Double.TryParse(parameter.Replace("m", String.Empty), NumberStyles.Number, CultureInfo.InvariantCulture, out double c)) throw new FormatException(nameof(text));
+                    parameters.Add(c);
+                }
+                else throw new FormatException(nameof(text));
+            }
+            
+            return new Pudelko(parameters[0], parameters[1], parameters[2]);
         }
 
         //metoda rozszerzajaca
