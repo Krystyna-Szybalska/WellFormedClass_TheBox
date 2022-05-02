@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -96,9 +97,6 @@ namespace ThBoxUnitTests
             AssertPudelko(p, expectedA, expectedB, expectedC);
         }
 
-
-        // ----
-
         [DataTestMethod, TestCategory("Constructors")]
         [DataRow(1.0, 2.5, 1.0, 2.5)]
         [DataRow(1.001, 2.599, 1.001, 2.599)]
@@ -143,7 +141,6 @@ namespace ThBoxUnitTests
             AssertPudelko(p, expectedA, expectedB, expectedC: 0.1);
         }
 
-        // -------
 
         [DataTestMethod, TestCategory("Constructors")]
         [DataRow(2.5)]
@@ -188,9 +185,7 @@ namespace ThBoxUnitTests
 
             AssertPudelko(p, expectedA, expectedB: 0.1, expectedC: 0.1);
         }
-
-        // ---
-
+        
         public static IEnumerable<object[]> DataSet1Meters_ArgumentOutOfRangeEx => new List<object[]>
         {
             new object[] {-1.0, 2.5, 3.1},
@@ -262,7 +257,6 @@ namespace ThBoxUnitTests
         {
             Pudelko p = new Pudelko(a, b, c, unit: UnitOfMeasure.Centimeter);
         }
-
 
         [DataTestMethod, TestCategory("Constructors")]
         [DataRow(-1, 1, 1)]
@@ -364,8 +358,6 @@ namespace ThBoxUnitTests
         }
 
 
-
-
         [DataTestMethod, TestCategory("Constructors")]
         [DataRow(-1.0)]
         [DataRow(0)]
@@ -447,19 +439,156 @@ namespace ThBoxUnitTests
 
         #region Pole, Objętość ===================================
 
-        // ToDo
+        [DataTestMethod, TestCategory("Area and volume")]
+        [DataRow(2.5, 9.321, 0.1, UnitOfMeasure.Meter, 48.969200)]
+        [DataRow(2.5, 100, 300, UnitOfMeasure.Centimeter, 6.2)]
+        [DataRow(500, 3000, 1000, UnitOfMeasure.Millimeter, 10)]
 
+        public void Pole_ShouldReturnAreaOfPudelko(double a, double b, double c, UnitOfMeasure unit, double expectedResult)
+        {
+            var p = new Pudelko(a,b,c,unit);
+            var area = p.Pole;
+            Assert.AreEqual(expectedResult, area);
+        }
+        
+        [DataTestMethod, TestCategory("Area and volume")]
+        [DataRow(2.5, 9.321, 0.1, UnitOfMeasure.Meter, 2.33025)]
+        [DataRow(2.5, 100, 300, UnitOfMeasure.Centimeter, 0.075)]
+        [DataRow(500, 3000, 1000, UnitOfMeasure.Millimeter, 1.5)]
+        public void Objetosc_ShouldReturnVolumeOfPudelko(double a, double b, double c, UnitOfMeasure unit, double expectedResult)
+        {
+            var p = new Pudelko(a,b,c,unit);
+            var volume = p.Objetosc;
+            Assert.AreEqual(expectedResult, volume);
+        }
         #endregion
 
         #region Equals ===========================================
 
-        // ToDo
-
+        [TestMethod, TestCategory("Equals")]
+        public void Equals_Null_ShouldReturnFalse()
+        {
+            var p = new Pudelko(1, 1, 1);
+            var result = p.Equals(null);
+            Assert.IsFalse(result);
+        }
+       
+        [TestMethod, TestCategory("Equals")]
+        public void Equals_TheSameBox_ShouldReturnTrue()
+        {
+            var p = new Pudelko(1, 1, 1);
+            var result = p.Equals(p);
+            Assert.IsTrue(result);
+        }
+        
+        [TestMethod, TestCategory("Equals")]
+        public void Equals_OtherObject_ShouldReturnFalse()
+        {
+            var p = new Pudelko(1, 1, 1);
+            var otherObject = new List<double> {1,1,1};
+            var result = p.Equals(otherObject);
+            Assert.IsFalse(result);
+        }
+        
+        [DataTestMethod, TestCategory("Equals")]
+        [DataRow(1,2,3)]
+        [DataRow(1,3,2)]
+        [DataRow(2,1,3)]
+        [DataRow(2,3,1)]
+        [DataRow(3,1,2)]
+        [DataRow(3,2,1)]
+        public void Equals_NewBoxWithTheSameValues_ShouldReturnTrue(double a, double b, double c)
+        {
+            var p = new Pudelko(1, 2, 3);
+            var result = p.Equals(new Pudelko(a, b, c));
+            Assert.IsTrue(result);
+        }
         #endregion
 
         #region Operators overloading ===========================
+        
+        [DataTestMethod, TestCategory("Operators overloading")]
+        [DataRow(3,2,1,5,5,5,6,5,5)]
+        [DataRow(0.5,1,3,0.2,0.1,0.2,3,1,0.6)]
+        [DataRow(0.1,0.2,0.33,0.1,0.1,0.2,0.2,0.2,0.33)]
+        public void OperatorAddBoxes_ShouldReturnBox(double a, double b, double c, double otherA, double otherB,
+            double otherC, double expectedA, double expectedB, double expectedC)
+        {
+            var box = new Pudelko(a,b,c);
+            var otherBox = new Pudelko(otherA, otherB, otherC);
+            var compoundBox = box + otherBox;
+            Assert.AreEqual(new Pudelko(expectedA, expectedB, expectedC), compoundBox);
+        }
+        
+        [TestMethod, TestCategory("Operators overloading")]
+        public void OperatorEquals_NullAndNull_ShouldBeTrue()
+        {
+            var result = null == null;
+            Assert.IsTrue(result);
+        }
+        
+        [TestMethod, TestCategory("Operators overloading")]
+        public void OperatorEquals_NullAndNotNull_ShouldBeFalse()
+        {
+            var result = null == new Pudelko();
+            Assert.IsFalse(result);
+        }
 
-        // ToDo
+        [TestMethod, TestCategory("Operators overloading")]
+        public void OperatorEquals_NotNullAndNull_ShouldBeFalse()
+        {
+            var result = new Pudelko() == null;
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod, TestCategory("Operators overloading")]
+        public void OperatorEquals_NotEqualBoxes_ShouldBeFalse()
+        {
+            var result = new Pudelko(10,10,10) == new Pudelko(1,1,1);
+            Assert.IsFalse(result);
+        }
+ 
+        [TestMethod, TestCategory("Operators overloading")]
+        public void OperatorEquals_EqualBoxes_ShouldBeTrue()
+        {
+            var result = new Pudelko(1,2,3) == new Pudelko(3,2,1);
+            Assert.IsTrue(result);
+        }
+        
+        [TestMethod, TestCategory("Operators overloading")]
+        public void OperatorNotEquals_NullAndNull_ShouldBeFalse()
+        {
+            var result = null != null;
+            Assert.IsFalse(result);
+        }
+        
+        [TestMethod, TestCategory("Operators overloading")]
+        public void OperatorNotEquals_NullAndNotNull_ShouldBeTrue()
+        {
+            var result = null != new Pudelko();
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod, TestCategory("Operators overloading")]
+        public void OperatorNotEquals_NotNullAndNull_ShouldBeTrue()
+        {
+            var result = new Pudelko() != null;
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod, TestCategory("Operators overloading")]
+        public void OperatorNotEquals_DifferentBoxes_ShouldBeTrue()
+        {
+            var result = new Pudelko(10,10,10) != new Pudelko(1,1,1);
+            Assert.IsTrue(result);
+        }
+ 
+        [TestMethod, TestCategory("Operators overloading")]
+        public void OperatorNotEquals_BoxesAreTheSame_ShouldBeFalse()
+        {
+            var result = new Pudelko(1,2,3) != new Pudelko(3,2,1);
+            Assert.IsFalse(result);
+        }
 
         #endregion
 
@@ -513,9 +642,17 @@ namespace ThBoxUnitTests
         }
 
         #endregion
-
-        #region Parsing =========================================
-
+        
+        #region Compressing =========================================
+        [DataTestMethod]
+        [DataRow(2,3,5)]
+        [DataRow(2,2,2)]
+        [DataRow(0.4,0.03,0.15)]
+        public void CompressedBoxVolume_ShouldEqualGivenBoxVolume(double a, double b, double c)
+        {
+            var box = new Pudelko(a, b, c);
+            Assert.AreEqual(box.Objetosc, box.Kompresuj().Objetosc,0.01);
+        }
         #endregion
     }
 }

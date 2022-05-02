@@ -23,20 +23,22 @@ namespace WellFormedClass_TheBox
 
         public Pudelko(double a = Double.MinValue, double b = Double.MinValue, double c = Double.MinValue, UnitOfMeasure unit = UnitOfMeasure.Meter)
         {
+            if (unit == null) unit = UnitOfMeasure.Meter;
+        
             if (a == Double.MinValue) _a = 0.1;
             else _a = UnitMeasureConverter.ConvertToMeters(a, unit);
             
-            if (_a is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(_a),$"a must be >0 and <=10");
+            if (_a is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(_a),$"a - {_a} - must be >0 and <=10");
 
             if (b == Double.MinValue) _b = 0.1;
             else _b = UnitMeasureConverter.ConvertToMeters(b, unit);
             
-            if (_b is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(_b), $"b must be >0 and <=10");
+            if (_b is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(_b), $"b - {_b} - must be >0 and <=10");
             
             if (c == Double.MinValue) _c= 0.1;
             else _c = UnitMeasureConverter.ConvertToMeters(c, unit);
             
-            if (_c is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(_c), "c must be >0 and <=10");
+            if (_c is <= 0 or > 10 ) throw new ArgumentOutOfRangeException(nameof(_c), $"_c - {_c}, c {c}, unit {unit} - must be >0 and <=10");
         }
         
         public override string ToString() {
